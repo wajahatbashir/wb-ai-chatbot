@@ -7,6 +7,13 @@ A self-contained AI shopping assistant for Magento 2: answers product and policy
 recommends and compares products, and lets customers and guests check orders, download
 invoices and open support requests from the chat - with secure email verification.
 
+## Screenshots
+
+![WB_AiChatbot admin walkthrough](.github/assets/dashboard-demo.gif)
+
+Configuration, the storefront widget, the admin dashboard, AI provider credentials, the
+knowledge base, support requests, the in-admin preview chat, and the built-in user manual.
+
 📖 **[USER_MANUAL.md](USER_MANUAL.md)** - full admin guide: every configuration field, every
 admin screen, the storefront widget from the customer's side, troubleshooting/FAQ, and how to
 extend the module. This README stays a short technical summary. The same manual is also

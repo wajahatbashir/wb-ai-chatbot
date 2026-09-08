@@ -1,0 +1,188 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">wb_aichatbot_conversation_listing.wb_aichatbot_conversation_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>wb_aichatbot_conversation_listing_columns</spinner>
+        <deps><dep>wb_aichatbot_conversation_listing.wb_aichatbot_conversation_listing_data_source</dep></deps>
+    </settings>
+    <dataSource name="wb_aichatbot_conversation_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig><param name="indexField" xsi:type="string">conversation_id</param></storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>WB_AiChatbot::conversations</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="wb_aichatbot_conversation_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>conversation_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings><sticky>true</sticky></settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="status_closed">
+                <settings>
+                    <url path="wb_aichatbot/conversation/massStatus"><param name="status">closed</param></url>
+                    <type>status_closed</type>
+                    <label translate="true">Close</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <url path="wb_aichatbot/conversation/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                    <confirm><title translate="true">Delete</title><message translate="true">Delete the selected conversations and their messages?</message></confirm>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="wb_aichatbot_conversation_listing_columns">
+        <selectionsColumn name="ids">
+            <settings><indexField>conversation_id</indexField></settings>
+        </selectionsColumn>
+        <column name="conversation_id">
+            <settings>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="title">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">First question</label>
+            </settings>
+        </column>
+        <column name="visitor_name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Visitor</label>
+            </settings>
+        </column>
+        <column name="customer_email">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Email</label>
+            </settings>
+        </column>
+        <column name="store_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Store</label>
+            </settings>
+        </column>
+        <column name="status" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="WB\AiChatbot\Model\Source\ConversationStatus"/>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="mode" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="WB\AiChatbot\Model\Source\Mode"/>
+                <dataType>select</dataType>
+                <label translate="true">Mode</label>
+            </settings>
+        </column>
+        <column name="messages_count">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Msgs</label>
+            </settings>
+        </column>
+        <column name="prompt_tokens">
+            <settings>
+                <filter>textRange</filter>
+                <visible>false</visible>
+                <label translate="true">Tokens in</label>
+            </settings>
+        </column>
+        <column name="completion_tokens">
+            <settings>
+                <filter>textRange</filter>
+                <visible>false</visible>
+                <label translate="true">Tokens out</label>
+            </settings>
+        </column>
+        <column name="cost">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Cost (USD)</label>
+            </settings>
+        </column>
+        <column name="rating" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="WB\AiChatbot\Model\Source\Rating"/>
+                <dataType>select</dataType>
+                <label translate="true">Rating</label>
+            </settings>
+        </column>
+        <column name="language">
+            <settings>
+                <filter>text</filter>
+                <visible>false</visible>
+                <label translate="true">Lang</label>
+            </settings>
+        </column>
+        <column name="country">
+            <settings>
+                <filter>text</filter>
+                <visible>false</visible>
+                <label translate="true">Country</label>
+            </settings>
+        </column>
+        <column name="is_preview" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <dataType>select</dataType>
+                <label translate="true">Preview</label>
+            </settings>
+        </column>
+        <column name="started_at" component="Magento_Ui/js/grid/columns/date" class="Magento\Ui\Component\Listing\Columns\Date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Started</label>
+            </settings>
+        </column>
+        <column name="last_message_at" component="Magento_Ui/js/grid/columns/date" class="Magento\Ui\Component\Listing\Columns\Date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <visible>false</visible>
+                <label translate="true">Last message</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="WB\AiChatbot\Ui\Component\Listing\Columns\RowActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="route" xsi:type="string">wb_aichatbot/conversation</item>
+                    <item name="id_field" xsi:type="string">conversation_id</item>
+                        <item name="edit_label" xsi:type="string">View</item>
+                        <item name="edit_action" xsi:type="string">view</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>conversation_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">wb_aichatbot_qa_listing.wb_aichatbot_qa_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>wb_aichatbot_qa_listing_columns</spinner>
+        <deps><dep>wb_aichatbot_qa_listing.wb_aichatbot_qa_listing_data_source</dep></deps>
+    </settings>
+    <dataSource name="wb_aichatbot_qa_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig><param name="indexField" xsi:type="string">qa_id</param></storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>WB_AiChatbot::qa</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="wb_aichatbot_qa_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>qa_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings><sticky>true</sticky></settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="status_enable">
+                <settings>
+                    <url path="wb_aichatbot/qa/massStatus"><param name="status">1</param></url>
+                    <type>status_enable</type>
+                    <label translate="true">Enable</label>
+                </settings>
+            </action>
+            <action name="status_disable">
+                <settings>
+                    <url path="wb_aichatbot/qa/massStatus"><param name="status">0</param></url>
+                    <type>status_disable</type>
+                    <label translate="true">Disable</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <url path="wb_aichatbot/qa/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                    <confirm><title translate="true">Delete</title><message translate="true">Delete the selected Q&amp;A pairs?</message></confirm>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="wb_aichatbot_qa_listing_columns">
+        <selectionsColumn name="ids">
+            <settings><indexField>qa_id</indexField></settings>
+        </selectionsColumn>
+        <column name="qa_id">
+            <settings>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="question">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Question</label>
+            </settings>
+        </column>
+        <column name="alternatives">
+            <settings>
+                <filter>text</filter>
+                <visible>false</visible>
+                <label translate="true">Alternatives</label>
+            </settings>
+        </column>
+        <column name="answer">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Answer</label>
+            </settings>
+        </column>
+        <column name="url">
+            <settings>
+                <filter>text</filter>
+                <visible>false</visible>
+                <label translate="true">URL</label>
+            </settings>
+        </column>
+        <column name="store_ids">
+            <settings>
+                <filter>text</filter>
+                <visible>false</visible>
+                <label translate="true">Store IDs</label>
+            </settings>
+        </column>
+        <column name="is_enabled" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="Magento\Config\Model\Config\Source\Yesno"/>
+                <dataType>select</dataType>
+                <label translate="true">Enabled</label>
+            </settings>
+        </column>
+        <column name="hits">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Used</label>
+            </settings>
+        </column>
+        <column name="updated_at" component="Magento_Ui/js/grid/columns/date" class="Magento\Ui\Component\Listing\Columns\Date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Updated</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="WB\AiChatbot\Ui\Component\Listing\Columns\RowActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="route" xsi:type="string">wb_aichatbot/qa</item>
+                    <item name="id_field" xsi:type="string">qa_id</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>qa_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

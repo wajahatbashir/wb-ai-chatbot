@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
+    <exchange name="wb-aichatbot-exchange" type="topic" connection="db">
+        <binding id="wbAichatbotKbIndex" topic="wb.aichatbot.kb.index" destinationType="queue" destination="wb_aichatbot_kb_index"/>
+    </exchange>
+</config>

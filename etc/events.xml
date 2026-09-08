@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_after">
+        <observer name="wb_aichatbot_product_changed" instance="WB\AiChatbot\Observer\ProductChanged"/>
+    </event>
+    <event name="catalog_product_delete_after">
+        <observer name="wb_aichatbot_product_deleted" instance="WB\AiChatbot\Observer\ProductChanged"/>
+    </event>
+    <event name="catalog_category_save_after">
+        <observer name="wb_aichatbot_category_changed" instance="WB\AiChatbot\Observer\CategoryChanged"/>
+    </event>
+    <event name="catalog_category_delete_after">
+        <observer name="wb_aichatbot_category_deleted" instance="WB\AiChatbot\Observer\CategoryChanged"/>
+    </event>
+    <event name="cms_page_save_after">
+        <observer name="wb_aichatbot_cms_page_changed" instance="WB\AiChatbot\Observer\CmsPageChanged"/>
+    </event>
+    <event name="cms_page_delete_after">
+        <observer name="wb_aichatbot_cms_page_deleted" instance="WB\AiChatbot\Observer\CmsPageChanged"/>
+    </event>
+</config>

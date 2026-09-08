@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <wb_aichatbot>
+            <general>
+                <enable>0</enable>
+                <mode>auto</mode>
+                <hide_until_synced>0</hide_until_synced>
+                <customer_groups/>
+            </general>
+            <assistant>
+                <name>Shopping Assistant</name>
+                <welcome_message>Hi! I'm your shopping assistant. Ask me about our jewellery, shipping, returns, or your order.</welcome_message>
+                <default_questions>What is ready to ship right now?
+Do you ship internationally?
+Where is my order?
+What is your return policy?</default_questions>
+                <preferred_language>en</preferred_language>
+                <base_prompt/>
+                <instructions/>
+                <tone>warm, concise, premium boutique</tone>
+                <max_reply_tokens>600</max_reply_tokens>
+                <temperature>0.3</temperature>
+                <max_messages>40</max_messages>
+                <max_tool_iterations>4</max_tool_iterations>
+            </assistant>
+            <assist>
+                <show_notice>1</show_notice>
+                <notice_text>Our AI assistant is temporarily unavailable, but I can still help you find products, check an order, and answer questions about shipping and returns.</notice_text>
+                <retry_minutes>5</retry_minutes>
+                <max_products>4</max_products>
+            </assist>
+            <widget>
+                <position>bottom_right</position>
+                <primary_color>#1b1f1d</primary_color>
+                <launcher_title>Chat</launcher_title>
+                <window_title>Chat with us</window_title>
+                <window_subtitle>Your personal shopping assistant</window_subtitle>
+                <invitation_message>Need help choosing? Ask me anything.</invitation_message>
+                <invitation_delay>8</invitation_delay>
+                <bottom_offset_mobile>70</bottom_offset_mobile>
+                <sound>0</sound>
+                <allow_attachments>1</allow_attachments>
+                <allow_human_handoff>1</allow_human_handoff>
+                <link_target>_self</link_target>
+                <excluded_pages>checkout_index_index
+onestepcheckout_index_index</excluded_pages>
+            </widget>
+            <limits>
+                <messages_per_minute>12</messages_per_minute>
+                <conversations_per_day>50</conversations_per_day>
+                <max_message_length>1000</max_message_length>
+                <codes_per_hour_email>5</codes_per_hour_email>
+                <codes_per_hour_ip>20</codes_per_hour_ip>
+                <code_ttl_minutes>10</code_ttl_minutes>
+                <daily_token_budget>0</daily_token_budget>
+                <retention_days>365</retention_days>
+                <redact_pii>0</redact_pii>
+            </limits>
+            <notifications>
+                <notify_on_provider_failure>1</notify_on_provider_failure>
+                <notify_on_request>1</notify_on_request>
+                <template_verification>wb_aichatbot_notifications_template_verification</template_verification>
+                <template_request_confirmation>wb_aichatbot_notifications_template_request_confirmation</template_request_confirmation>
+                <template_request_admin>wb_aichatbot_notifications_template_request_admin</template_request_admin>
+                <template_request_reply>wb_aichatbot_notifications_template_request_reply</template_request_reply>
+                <template_provider_failure>wb_aichatbot_notifications_template_provider_failure</template_provider_failure>
+            </notifications>
+            <developer>
+                <debug_log>0</debug_log>
+                <allow_mock>0</allow_mock>
+            </developer>
+        </wb_aichatbot>
+    </default>
+</config>

@@ -1,0 +1,131 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">wb_aichatbot_unanswered_listing.wb_aichatbot_unanswered_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>wb_aichatbot_unanswered_listing_columns</spinner>
+        <deps><dep>wb_aichatbot_unanswered_listing.wb_aichatbot_unanswered_listing_data_source</dep></deps>
+    </settings>
+    <dataSource name="wb_aichatbot_unanswered_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig><param name="indexField" xsi:type="string">unanswered_id</param></storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>WB_AiChatbot::unanswered</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="wb_aichatbot_unanswered_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>unanswered_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings><sticky>true</sticky></settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="status_ignored">
+                <settings>
+                    <url path="wb_aichatbot/unanswered/massStatus"><param name="status">ignored</param></url>
+                    <type>status_ignored</type>
+                    <label translate="true">Mark ignored</label>
+                </settings>
+            </action>
+            <action name="status_answered">
+                <settings>
+                    <url path="wb_aichatbot/unanswered/massStatus"><param name="status">answered</param></url>
+                    <type>status_answered</type>
+                    <label translate="true">Mark answered</label>
+                </settings>
+            </action>
+            <action name="status_new">
+                <settings>
+                    <url path="wb_aichatbot/unanswered/massStatus"><param name="status">new</param></url>
+                    <type>status_new</type>
+                    <label translate="true">Mark new</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <url path="wb_aichatbot/unanswered/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                    <confirm><title translate="true">Delete</title><message translate="true">Delete the selected questions?</message></confirm>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="wb_aichatbot_unanswered_listing_columns">
+        <selectionsColumn name="ids">
+            <settings><indexField>unanswered_id</indexField></settings>
+        </selectionsColumn>
+        <column name="unanswered_id">
+            <settings>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="question">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Question</label>
+            </settings>
+        </column>
+        <column name="language">
+            <settings>
+                <filter>text</filter>
+                <visible>false</visible>
+                <label translate="true">Lang</label>
+            </settings>
+        </column>
+        <column name="retrieval_score">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Best match</label>
+            </settings>
+        </column>
+        <column name="status" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="WB\AiChatbot\Model\Source\UnansweredStatus"/>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="conversation_id">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Conversation</label>
+            </settings>
+        </column>
+        <column name="created_at" component="Magento_Ui/js/grid/columns/date" class="Magento\Ui\Component\Listing\Columns\Date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Asked</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="WB\AiChatbot\Ui\Component\Listing\Columns\RowActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="route" xsi:type="string">wb_aichatbot/unanswered</item>
+                    <item name="id_field" xsi:type="string">unanswered_id</item>
+                        <item name="edit_label" xsi:type="string">Create Q&amp;A from this</item>
+                        <item name="edit_action" xsi:type="string">toQa</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>unanswered_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

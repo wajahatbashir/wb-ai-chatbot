@@ -1,0 +1,104 @@
+<?php
+/** @var \WB\AiChatbot\Block\Adminhtml\Knowledge\Tester $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$query = $block->getQuery();
+$results = $block->getResults();
+?>
+<style>
+    .wb-kb-tester__form { background: #fff; border: 1px solid #e3e3e3; border-radius: 4px; padding: 16px 20px; margin-bottom: 20px; }
+    .wb-kb-tester__row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; }
+    .wb-kb-tester__row label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+    .wb-kb-tester__row .admin__control-text { min-width: 420px; }
+    .wb-kb-tester__result { background: #fff; border: 1px solid #e3e3e3; border-radius: 4px; padding: 14px 18px; margin-bottom: 12px; }
+    .wb-kb-tester__head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .wb-kb-tester__title { font-size: 15px; font-weight: 600; }
+    .wb-kb-tester__scores { font-size: 12px; color: #514943; }
+    .wb-kb-tester__scores span { display: inline-block; margin-left: 12px; }
+    .wb-kb-tester__badge { display: inline-block; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; padding: 1px 6px; border-radius: 3px; background: #eef3f8; color: #2f5f8f; margin-right: 8px; }
+    .wb-kb-tester__text { white-space: pre-wrap; font-family: monospace; font-size: 12px; background: #fafafa; border: 1px solid #f0f0f0; padding: 8px; margin-top: 8px; max-height: 240px; overflow: auto; }
+    .wb-kb-tester__meta { font-size: 12px; color: #757575; margin-top: 6px; }
+</style>
+<div class="wb-kb-tester">
+    <form class="wb-kb-tester__form" method="get" action="<?= $escaper->escapeUrl($block->getUrl('*/*/tester')) ?>">
+        <div class="wb-kb-tester__row">
+            <div>
+                <label for="wb-kb-q"><?= $escaper->escapeHtml(__('Customer question')) ?></label>
+                <input id="wb-kb-q" class="admin__control-text" type="text" name="q" value="<?= $escaper->escapeHtmlAttr($query) ?>" placeholder="<?= $escaper->escapeHtmlAttr(__('e.g. do you ship to Canada, gold polki earrings under 20000')) ?>"/>
+            </div>
+            <div>
+                <label for="wb-kb-store"><?= $escaper->escapeHtml(__('Store view')) ?></label>
+                <select id="wb-kb-store" class="admin__control-select" name="store">
+                    <?php foreach ($block->getStoreOptions() as $option): ?>
+                        <?php if (is_array($option['value'])): ?>
+                            <optgroup label="<?= $escaper->escapeHtmlAttr($option['label']) ?>">
+                                <?php foreach ($option['value'] as $store): ?>
+                                    <option value="<?= (int)$store['value'] ?>" <?= (int)$store['value'] === $block->getStoreId() ? 'selected' : '' ?>><?= $escaper->escapeHtml($store['label']) ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        <?php else: ?>
+                            <option value="<?= (int)$option['value'] ?>" <?= (int)$option['value'] === $block->getStoreId() ? 'selected' : '' ?>><?= $escaper->escapeHtml($option['label']) ?></option>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label for="wb-kb-type"><?= $escaper->escapeHtml(__('Source')) ?></label>
+                <select id="wb-kb-type" class="admin__control-select" name="type">
+                    <option value=""><?= $escaper->escapeHtml(__('All sources')) ?></option>
+                    <?php foreach ($block->getSourceTypeOptions() as $option): ?>
+                        <option value="<?= $escaper->escapeHtmlAttr($option['value']) ?>" <?= $option['value'] === $block->getSourceTypeFilter() ? 'selected' : '' ?>><?= $escaper->escapeHtml($option['label']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div>
+                <label for="wb-kb-limit"><?= $escaper->escapeHtml(__('Results')) ?></label>
+                <input id="wb-kb-limit" class="admin__control-text" style="min-width:60px;width:60px" type="number" min="1" max="20" name="limit" value="<?= (int)$block->getLimit() ?>"/>
+            </div>
+            <div>
+                <label class="admin__field-option">
+                    <input type="checkbox" name="keyword_only" value="1" <?= $block->isKeywordOnly() ? 'checked' : '' ?> <?= $block->isEmbeddingAvailable() ? '' : 'disabled' ?>/>
+                    <?= $escaper->escapeHtml(__('Keyword only')) ?>
+                </label>
+            </div>
+            <div>
+                <button type="submit" class="action-primary"><?= $escaper->escapeHtml(__('Search')) ?></button>
+                <a class="action-secondary" style="margin-left:8px" href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>"><?= $escaper->escapeHtml(__('Back to Knowledge Base')) ?></a>
+            </div>
+        </div>
+        <p class="wb-kb-tester__meta">
+            <?php if ($block->isEmbeddingAvailable()): ?>
+                <?= $escaper->escapeHtml(__('Hybrid retrieval: fulltext keyword candidates re-ranked by embedding similarity (0.7 vector + 0.3 keyword).')) ?>
+            <?php else: ?>
+                <?= $escaper->escapeHtml(__('No embedding provider is usable right now - results come from fulltext keyword matching, exactly what the chatbot uses in Assist mode.')) ?>
+            <?php endif; ?>
+        </p>
+    </form>
+
+    <?php if ($query !== ''): ?>
+        <p class="wb-kb-tester__meta">
+            <?= $escaper->escapeHtml(__('%1 result(s) in %2 ms for "%3"', count($results), (int)round($block->getElapsedMs()), $query)) ?>
+        </p>
+        <?php if ($results === []): ?>
+            <div class="message message-warning"><?= $escaper->escapeHtml(__('Nothing matched. The assistant would answer from its general instructions or offer a support request.')) ?></div>
+        <?php endif; ?>
+        <?php foreach ($results as $i => $row): ?>
+            <div class="wb-kb-tester__result">
+                <div class="wb-kb-tester__head">
+                    <div class="wb-kb-tester__title">
+                        <span class="wb-kb-tester__badge"><?= $escaper->escapeHtml($row['source_type']) ?></span>
+                        <?= (int)$i + 1 ?>. <a href="<?= $escaper->escapeUrl($block->getDocumentUrl((int)$row['document_id'])) ?>"><?= $escaper->escapeHtml($row['title']) ?></a>
+                    </div>
+                    <div class="wb-kb-tester__scores">
+                        <span><?= $escaper->escapeHtml(__('score')) ?> <strong><?= $escaper->escapeHtml(number_format((float)$row['score'], 3)) ?></strong></span>
+                        <span><?= $escaper->escapeHtml(__('keyword')) ?> <?= $escaper->escapeHtml(number_format((float)$row['keyword_score'], 3)) ?></span>
+                        <span><?= $escaper->escapeHtml(__('vector')) ?> <?= $row['vector_score'] === null ? '&ndash;' : $escaper->escapeHtml(number_format((float)$row['vector_score'], 3)) ?></span>
+                    </div>
+                </div>
+                <?php if (!empty($row['url'])): ?>
+                    <div class="wb-kb-tester__meta"><a href="<?= $escaper->escapeUrl($row['url']) ?>" target="_blank" rel="noopener"><?= $escaper->escapeHtml($row['url']) ?></a></div>
+                <?php endif; ?>
+                <div class="wb-kb-tester__text"><?= $escaper->escapeHtml($row['text']) ?></div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

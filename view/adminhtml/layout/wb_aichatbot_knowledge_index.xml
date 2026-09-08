@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="WB\AiChatbot\Block\Adminhtml\Knowledge" name="knowledge_grid_container"/>
+            <block class="WB\AiChatbot\Block\Adminhtml\Knowledge\Status" name="knowledge_status"/>
+            <uiComponent name="wb_aichatbot_knowledge_listing"/>
+        </referenceContainer>
+    </body>
+</page>

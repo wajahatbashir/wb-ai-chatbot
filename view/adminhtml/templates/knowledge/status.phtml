@@ -1,0 +1,45 @@
+<?php
+/** @var \WB\AiChatbot\Block\Adminhtml\Knowledge\Status $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$status = $block->getStatus();
+$embeddedPct = $status['chunks'] > 0 ? (int)round($status['embedded'] * 100 / $status['chunks']) : 0;
+$cards = [
+    [__('Documents'), (string)$status['documents'], __('%1 indexed', $status['indexed'])],
+    [__('Pending'), (string)$status['pending'], $status['failed'] ? __('%1 failed', $status['failed']) : __('nothing waiting')],
+    [__('Chunks'), (string)$status['chunks'], __('%1% embedded', $embeddedPct)],
+    [
+        __('Embeddings'),
+        $status['embedding_model'] ? $escaper->escapeHtml($status['embedding_model']) : __('none'),
+        $status['embedding_model'] ? __('semantic + keyword retrieval') : __('keyword retrieval only'),
+    ],
+    [
+        __('Engine'),
+        $block->isAiAvailable() ? __('AI') : __('Assist'),
+        $block->isChatbotEnabled() ? __('chatbot enabled') : __('chatbot disabled'),
+    ],
+];
+?>
+<style>
+    .wb-kb-status { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 20px; }
+    .wb-kb-status__card { flex: 1 1 150px; background: #fff; border: 1px solid #e3e3e3; border-radius: 4px; padding: 12px 16px; }
+    .wb-kb-status__label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #757575; }
+    .wb-kb-status__value { font-size: 22px; font-weight: 600; margin: 2px 0; color: #303030; word-break: break-all; }
+    .wb-kb-status__hint { font-size: 12px; color: #757575; }
+    .wb-kb-status__note { flex-basis: 100%; font-size: 13px; color: #514943; }
+</style>
+<div class="wb-kb-status">
+    <?php foreach ($cards as [$label, $value, $hint]): ?>
+        <div class="wb-kb-status__card">
+            <div class="wb-kb-status__label"><?= $escaper->escapeHtml($label) ?></div>
+            <div class="wb-kb-status__value"><?= /* @noEscape */ $value ?></div>
+            <div class="wb-kb-status__hint"><?= $escaper->escapeHtml($hint) ?></div>
+        </div>
+    <?php endforeach; ?>
+    <?php if (!$status['embedding_model']): ?>
+        <div class="wb-kb-status__note">
+            <?= $escaper->escapeHtml(__('No embedding-capable AI provider is usable right now, so answers rely on keyword matching. Add or fix a provider under')) ?>
+            <a href="<?= $escaper->escapeUrl($block->getProvidersUrl()) ?>"><?= $escaper->escapeHtml(__('AI Providers')) ?></a>
+            <?= $escaper->escapeHtml(__('and choose "Sync Now" to add embeddings; the chatbot keeps working either way.')) ?>
+        </div>
+    <?php endif; ?>
+</div>

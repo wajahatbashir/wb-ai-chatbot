@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="WB\AiChatbot\Api\CredentialRepositoryInterface" type="WB\AiChatbot\Model\CredentialRepository"/>
+    <preference for="WB\AiChatbot\Api\Data\CredentialInterface" type="WB\AiChatbot\Model\Credential"/>
+
+    <!-- Provider implementations, keyed by provider code. Third-party modules can add their own here. -->
+    <type name="WB\AiChatbot\Model\Provider\Pool">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="openai" xsi:type="object">WB\AiChatbot\Model\Provider\OpenAi</item>
+                <item name="anthropic" xsi:type="object">WB\AiChatbot\Model\Provider\Anthropic</item>
+                <item name="gemini" xsi:type="object">WB\AiChatbot\Model\Provider\Gemini</item>
+                <item name="xai" xsi:type="object">WB\AiChatbot\Model\Provider\Xai</item>
+                <item name="mock" xsi:type="object">WB\AiChatbot\Model\Provider\Mock</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Dedicated log file: var/log/wb_aichatbot.log -->
+    <virtualType name="WB\AiChatbot\Logger\Handler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/wb_aichatbot.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">wb_aichatbot</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">WB\AiChatbot\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="WB\AiChatbot\Model\Logger">
+        <arguments>
+            <argument name="logger" xsi:type="object">WB\AiChatbot\Logger</argument>
+        </arguments>
+    </type>
+
+    <!-- Knowledge base content sources. Add your own SyncProviderInterface implementation here. -->
+    <type name="WB\AiChatbot\Model\Kb\Sync\ProviderPool">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="store_info" xsi:type="object">WB\AiChatbot\Model\Kb\Sync\Provider\StoreInfo</item>
+                <item name="cms_page" xsi:type="object">WB\AiChatbot\Model\Kb\Sync\Provider\CmsPage</item>
+                <item name="category" xsi:type="object">WB\AiChatbot\Model\Kb\Sync\Provider\Category</item>
+                <item name="product" xsi:type="object">WB\AiChatbot\Model\Kb\Sync\Provider\Product</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Chunk size: ~1600 characters (~400 tokens) with 200 characters of overlap -->
+    <type name="WB\AiChatbot\Model\Kb\Chunker">
+        <arguments>
+            <argument name="targetChars" xsi:type="number">1600</argument>
+            <argument name="overlapChars" xsi:type="number">200</argument>
+        </arguments>
+    </type>
+
+    <!-- Entity-change observers (one generic observer configured per entity type) -->
+    <virtualType name="WB\AiChatbot\Observer\ProductChanged" type="WB\AiChatbot\Observer\EntityChanged">
+        <arguments>
+            <argument name="sourceType" xsi:type="string">product</argument>
+            <argument name="dataKey" xsi:type="string">product</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Observer\CategoryChanged" type="WB\AiChatbot\Observer\EntityChanged">
+        <arguments>
+            <argument name="sourceType" xsi:type="string">category</argument>
+            <argument name="dataKey" xsi:type="string">category</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Observer\CmsPageChanged" type="WB\AiChatbot\Observer\EntityChanged">
+        <arguments>
+            <argument name="sourceType" xsi:type="string">cms_page</argument>
+            <argument name="dataKey" xsi:type="string">object</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Chat tools (function calling in AI mode, guided flows in Assist mode). Add your own ToolInterface here. -->
+    <type name="WB\AiChatbot\Model\Chat\Tool\ToolRegistry">
+        <arguments>
+            <argument name="tools" xsi:type="array">
+                <item name="product_search" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\ProductSearch</item>
+                <item name="product_compare" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\ProductCompare</item>
+                <item name="cart_info" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\CartInfo</item>
+                <item name="order_info" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\OrderInfo</item>
+                <item name="order_tracking" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\OrderTracking</item>
+                <item name="order_invoice" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\OrderInvoice</item>
+                <item name="send_verification_code" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\SendVerificationCode</item>
+                <item name="verify_code" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\VerifyCode</item>
+                <item name="request_submit" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\RequestSubmit</item>
+                <item name="request_info" xsi:type="object">WB\AiChatbot\Model\Chat\Tool\RequestInfo</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Model prices (USD per 1M tokens: [input, output]) - extend when new models appear -->
+    <type name="WB\AiChatbot\Model\Chat\CostCalculator">
+        <arguments>
+            <argument name="prices" xsi:type="array"/>
+        </arguments>
+    </type>
+
+    <!-- Admin grids: generic UI-component collections over the flat tables -->
+    <virtualType name="WB\AiChatbot\Ui\Collection\Qa" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">wb_aichatbot_qa</argument>
+            <argument name="resourceModel" xsi:type="string">WB\AiChatbot\Model\ResourceModel\Table\Qa</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Ui\Collection\Intent" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">wb_aichatbot_intent</argument>
+            <argument name="resourceModel" xsi:type="string">WB\AiChatbot\Model\ResourceModel\Table\Intent</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Ui\Collection\Guidance" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">wb_aichatbot_guidance</argument>
+            <argument name="resourceModel" xsi:type="string">WB\AiChatbot\Model\ResourceModel\Table\Guidance</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Ui\Collection\Request" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">wb_aichatbot_request</argument>
+            <argument name="resourceModel" xsi:type="string">WB\AiChatbot\Model\ResourceModel\Table\Request</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Ui\Collection\Unanswered" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">wb_aichatbot_unanswered</argument>
+            <argument name="resourceModel" xsi:type="string">WB\AiChatbot\Model\ResourceModel\Table\Unanswered</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Ui\Collection\Conversation" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">wb_aichatbot_conversation</argument>
+            <argument name="resourceModel" xsi:type="string">WB\AiChatbot\Model\Chat\ResourceModel\Conversation</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="wb_aichatbot_qa_listing_data_source" xsi:type="string">WB\AiChatbot\Ui\Collection\Qa</item>
+                <item name="wb_aichatbot_intent_listing_data_source" xsi:type="string">WB\AiChatbot\Ui\Collection\Intent</item>
+                <item name="wb_aichatbot_guidance_listing_data_source" xsi:type="string">WB\AiChatbot\Ui\Collection\Guidance</item>
+                <item name="wb_aichatbot_request_listing_data_source" xsi:type="string">WB\AiChatbot\Ui\Collection\Request</item>
+                <item name="wb_aichatbot_unanswered_listing_data_source" xsi:type="string">WB\AiChatbot\Ui\Collection\Unanswered</item>
+                <item name="wb_aichatbot_conversation_listing_data_source" xsi:type="string">WB\AiChatbot\Ui\Collection\Conversation</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Option lists for grids/forms -->
+    <virtualType name="WB\AiChatbot\Model\Source\RequestStatus" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">request_status</argument></arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Model\Source\GuidanceStatus" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">guidance_status</argument></arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Model\Source\UnansweredStatus" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">unanswered_status</argument></arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Model\Source\ConversationStatus" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">conversation_status</argument></arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Model\Source\Mode" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">mode</argument></arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Model\Source\IntentCode" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">intent_code</argument></arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Model\Source\Language" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">language</argument></arguments>
+    </virtualType>
+    <virtualType name="WB\AiChatbot\Model\Source\Rating" type="WB\AiChatbot\Model\Source\Options">
+        <arguments><argument name="list" xsi:type="string">rating</argument></arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="wb_aichatbot_status" xsi:type="object">WB\AiChatbot\Console\Command\StatusCommand</item>
+                <item name="wb_aichatbot_sync" xsi:type="object">WB\AiChatbot\Console\Command\SyncCommand</item>
+                <item name="wb_aichatbot_search" xsi:type="object">WB\AiChatbot\Console\Command\SearchCommand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

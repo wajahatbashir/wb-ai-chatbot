@@ -1,0 +1,15 @@
+<?php
+/** @var \WB\AiChatbot\Block\Widget $block */
+/** @var \Magento\Framework\Escaper $escaper */
+if (!$block->isVisible()) {
+    return;
+}
+?>
+<div id="wb-aichatbot" class="wb-aichatbot-host" data-role="wb-aichatbot" aria-live="polite"></div>
+<script type="text/x-magento-init">
+{
+    "#wb-aichatbot": {
+        "WB_AiChatbot/js/widget": <?= /* @noEscape */ $block->getConfigJson() ?>
+    }
+}
+</script>

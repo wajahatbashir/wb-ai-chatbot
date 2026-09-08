@@ -1,0 +1,97 @@
+<?php
+/** @var \WB\AiChatbot\Block\Adminhtml\Conversation\View $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$c = $block->getConversation();
+$messages = $block->getMessages();
+$facts = [
+    [__('Status'), $block->label('conversation_status', $c['status'] ?? '')],
+    [__('Store view'), $block->getStoreName((int)($c['store_id'] ?? 0))],
+    [__('Visitor'), trim(($c['visitor_name'] ?? '') . ' ' . ($c['customer_email'] ? '<' . $c['customer_email'] . '>' : '')) ?: __('Guest')],
+    [__('Customer ID'), $c['customer_id'] ?: '-'],
+    [__('Verified emails'), $c['verified_emails'] ? implode(', ', json_decode((string)$c['verified_emails'], true) ?: []) : '-'],
+    [__('Started'), $c['started_at'] ?? ''],
+    [__('Last message'), $c['last_message_at'] ?? ''],
+    [__('Messages'), (int)($c['messages_count'] ?? 0)],
+    [__('Last engine mode'), $block->label('mode', $c['mode'] ?? '')],
+    [__('Tokens'), (int)($c['prompt_tokens'] ?? 0) . ' in / ' . (int)($c['completion_tokens'] ?? 0) . ' out'],
+    [__('Cost'), '$' . number_format((float)($c['cost'] ?? 0), 4)],
+    [__('Rating'), $c['rating'] ? str_repeat('★', (int)$c['rating']) . str_repeat('☆', 5 - (int)$c['rating']) . ($c['rating_comment'] ? ' - ' . $c['rating_comment'] : '') : '-'],
+    [__('First page'), $c['page_url_first'] ?: '-'],
+    [__('Preview'), !empty($c['is_preview']) ? __('Yes (admin preview)') : __('No')],
+];
+?>
+<style>
+    .wb-cv { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+    .wb-cv__panel { background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: 16px 18px; }
+    .wb-cv__facts { display: grid; grid-template-columns: 130px 1fr; gap: 6px 10px; font-size: 13px; margin: 0; }
+    .wb-cv__facts dt { color: #757575; } .wb-cv__facts dd { margin: 0; word-break: break-word; }
+    .wb-cv__msg { max-width: 80%; margin: 0 0 14px; }
+    .wb-cv__msg--user { margin-left: auto; }
+    .wb-cv__bubble { padding: 10px 14px; border-radius: 12px; white-space: pre-wrap; word-break: break-word; font-size: 14px; background: #f3f3f1; }
+    .wb-cv__msg--user .wb-cv__bubble { background: #1b1f1d; color: #fff; }
+    .wb-cv__meta { font-size: 11px; color: #757575; margin-top: 4px; display: flex; gap: 10px; flex-wrap: wrap; }
+    .wb-cv__tag { display: inline-block; padding: 1px 6px; border-radius: 3px; background: #eef3f8; color: #2f5f8f; }
+    .wb-cv__tag--assist { background: #fff3d6; color: #8a6d0b; }
+    .wb-cv__cards { font-size: 12px; margin-top: 6px; color: #444; }
+    .wb-cv__cards span { display: inline-block; background: #fff; border: 1px solid #e3e3e3; border-radius: 4px; padding: 2px 6px; margin: 2px 4px 2px 0; }
+    .wb-cv__details { font-size: 11px; margin-top: 4px; }
+    .wb-cv__details pre { background: #fafafa; border: 1px solid #eee; padding: 6px; max-height: 200px; overflow: auto; white-space: pre-wrap; }
+    .wb-cv__actions { margin-bottom: 16px; display: flex; gap: 10px; }
+</style>
+<div class="wb-cv__actions">
+    <a class="action-secondary" href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">← <?= $escaper->escapeHtml(__('Back to conversations')) ?></a>
+    <button type="button" class="action-secondary" onclick="deleteConfirm('<?= $escaper->escapeJs(__('Delete this conversation and its messages?')) ?>', '<?= $escaper->escapeJs($block->getDeleteUrl()) ?>', {data: {form_key: window.FORM_KEY}})"><?= $escaper->escapeHtml(__('Delete conversation')) ?></button>
+</div>
+<div class="wb-cv">
+    <div class="wb-cv__panel">
+        <?php if ($messages === []): ?>
+            <p><?= $escaper->escapeHtml(__('No messages.')) ?></p>
+        <?php endif; ?>
+        <?php foreach ($messages as $m): ?>
+            <div class="wb-cv__msg wb-cv__msg--<?= $m['role'] === 'user' ? 'user' : 'bot' ?>">
+                <div class="wb-cv__bubble"><?= $escaper->escapeHtml($m['content']) ?></div>
+                <?php if ($m['cards']): ?>
+                    <div class="wb-cv__cards"><?php foreach ($m['cards'] as $card): ?><span><?= $escaper->escapeHtml(($card['type'] ?? '') . ': ' . ($card['name'] ?? $card['label'] ?? $card['title'] ?? $card['increment_id'] ?? '')) ?></span><?php endforeach; ?></div>
+                <?php endif; ?>
+                <div class="wb-cv__meta">
+                    <span><?= $escaper->escapeHtml($m['created_at']) ?></span>
+                    <?php if ($m['role'] !== 'user'): ?>
+                        <span class="wb-cv__tag <?= $m['mode'] === 'assist' ? 'wb-cv__tag--assist' : '' ?>"><?= $escaper->escapeHtml($block->label('mode', $m['mode'])) ?></span>
+                        <?php if ($m['model']): ?><span><?= $escaper->escapeHtml($m['model']) ?></span><?php endif; ?>
+                        <?php if ((int)$m['prompt_tokens'] + (int)$m['completion_tokens'] > 0): ?><span><?= (int)$m['prompt_tokens'] ?> / <?= (int)$m['completion_tokens'] ?> <?= $escaper->escapeHtml(__('tokens')) ?></span><?php endif; ?>
+                        <span><?= (int)$m['latency_ms'] ?> ms</span>
+                        <span><?= $m['was_grounded'] ? $escaper->escapeHtml(__('grounded')) : $escaper->escapeHtml(__('not grounded')) ?></span>
+                        <?php if ($m['feedback'] !== null): ?><span><?= (int)$m['feedback'] === 1 ? '👍' : '👎' ?></span><?php endif; ?>
+                    <?php elseif ($m['attachments']): ?>
+                        <span><?= $escaper->escapeHtml(__('%1 attachment(s)', count($m['attachments']))) ?></span>
+                    <?php endif; ?>
+                </div>
+                <?php if ($m['tool_calls'] || $m['sources']): ?>
+                    <details class="wb-cv__details"><summary><?= $escaper->escapeHtml(__('Tool calls & sources')) ?></summary>
+                        <?php if ($m['tool_calls']): ?><pre><?= $escaper->escapeHtml(json_encode($m['tool_calls'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) ?></pre><?php endif; ?>
+                        <?php if ($m['sources']): ?><pre><?= $escaper->escapeHtml(implode("\n", array_map(function ($s) { return (isset($s['confidence']) ? '[' . $s['confidence'] . '] ' : '') . ($s['title'] ?? '') . (isset($s['url']) && $s['url'] ? ' - ' . $s['url'] : ''); }, $m['sources']))) ?></pre><?php endif; ?>
+                    </details>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <div>
+        <div class="wb-cv__panel">
+            <dl class="wb-cv__facts">
+                <?php foreach ($facts as [$label, $value]): ?>
+                    <dt><?= $escaper->escapeHtml($label) ?></dt><dd><?= $escaper->escapeHtml((string)$value) ?></dd>
+                <?php endforeach; ?>
+            </dl>
+        </div>
+        <?php if ($requests = $block->getRequests()): ?>
+            <div class="wb-cv__panel" style="margin-top:16px">
+                <strong><?= $escaper->escapeHtml(__('Support requests')) ?></strong>
+                <ul style="margin:8px 0 0 16px;padding:0;font-size:13px">
+                    <?php foreach ($requests as $r): ?>
+                        <li><a href="<?= $escaper->escapeUrl($block->getRequestUrl((int)$r['request_id'])) ?>"><?= $escaper->escapeHtml($r['code']) ?></a> · <?= $escaper->escapeHtml($block->label('request_status', $r['status'])) ?> · <?= $escaper->escapeHtml($r['subject']) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>

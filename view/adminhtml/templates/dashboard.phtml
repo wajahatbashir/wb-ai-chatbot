@@ -1,0 +1,108 @@
+<?php
+/** @var \WB\AiChatbot\Block\Adminhtml\Dashboard $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$s = $block->getStats();
+$daily = $block->getDaily(14);
+$engine = $block->getEngine();
+$maxConv = max(1, max(array_column($daily, 'conversations')));
+$maxTokens = max(1, max(array_column($daily, 'tokens')));
+$cards = [
+    [__('Chats today'), $s['today'], __('%1 yesterday', $s['yesterday'])],
+    [__('Chats, 7 days'), $s['week'], __('%1 customer messages', $s['messages_week'])],
+    [__('Active now'), $s['active'], __('last 15 minutes')],
+    [__('Answered by AI'), $s['ai_share'] . '%', __('of replies, 7 days')],
+    [__('Rating'), $s['rating_count'] ? number_format($s['rating_avg'], 1) . ' / 5' : '-', __('%1 rated · 👍 %2 · 👎 %3', $s['rating_count'], $s['thumbs_up'], $s['thumbs_down'])],
+    [__('Needs attention'), $s['requests_open'] + $s['unanswered_new'], __('%1 open requests · %2 unanswered', $s['requests_open'], $s['unanswered_new'])],
+];
+?>
+<style>
+    .wb-db__cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .wb-db__card { background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: 12px 16px; }
+    .wb-db__label { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: #757575; }
+    .wb-db__value { font-size: 26px; font-weight: 600; margin: 2px 0; }
+    .wb-db__hint { font-size: 12px; color: #757575; }
+    .wb-db__grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .wb-db__panel { background: #fff; border: 1px solid #e3e3e3; border-radius: 6px; padding: 16px 18px; margin-bottom: 20px; }
+    .wb-db__panel h3 { margin: 0 0 12px; font-size: 15px; }
+    .wb-db__bars { display: flex; align-items: flex-end; gap: 6px; height: 150px; }
+    .wb-db__bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; font-size: 10px; color: #757575; }
+    .wb-db__bar i { display: block; width: 100%; background: #1b1f1d; border-radius: 3px 3px 0 0; min-height: 2px; }
+    .wb-db__bar i.tok { background: #8fb3d9; }
+    .wb-db__bar b { font-weight: 600; color: #303030; margin-bottom: 2px; }
+    .wb-db__table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .wb-db__table td, .wb-db__table th { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; }
+    .wb-db__table td.num, .wb-db__table th.num { text-align: right; }
+    .wb-db__engine dt { color: #757575; font-size: 12px; } .wb-db__engine dd { margin: 0 0 8px; font-weight: 600; }
+    .wb-db__ok { color: #1e6b3a; } .wb-db__warn { color: #8a6d0b; }
+</style>
+
+<div class="wb-db__cards">
+    <?php foreach ($cards as [$label, $value, $hint]): ?>
+        <div class="wb-db__card"><div class="wb-db__label"><?= $escaper->escapeHtml($label) ?></div><div class="wb-db__value"><?= $escaper->escapeHtml((string)$value) ?></div><div class="wb-db__hint"><?= $escaper->escapeHtml($hint) ?></div></div>
+    <?php endforeach; ?>
+</div>
+
+<div class="wb-db__grid">
+    <div>
+        <div class="wb-db__panel">
+            <h3><?= $escaper->escapeHtml(__('Conversations per day (14 days)')) ?></h3>
+            <div class="wb-db__bars">
+                <?php foreach ($daily as $d): ?>
+                    <div class="wb-db__bar" title="<?= $escaper->escapeHtmlAttr($d['date'] . ': ' . $d['conversations'] . ' chats, ' . $d['messages'] . ' replies') ?>">
+                        <b><?= (int)$d['conversations'] ?: '' ?></b>
+                        <i style="height: <?= (int)round(100 * $d['conversations'] / $maxConv) ?>%"></i>
+                        <span><?= $escaper->escapeHtml(date('d M', strtotime($d['date']))) ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div class="wb-db__panel">
+            <h3><?= $escaper->escapeHtml(__('Tokens per day (14 days)')) ?></h3>
+            <div class="wb-db__bars">
+                <?php foreach ($daily as $d): ?>
+                    <div class="wb-db__bar" title="<?= $escaper->escapeHtmlAttr($d['date'] . ': ' . number_format($d['tokens']) . ' tokens, $' . number_format($d['cost'], 4)) ?>">
+                        <b><?= $d['tokens'] ? $escaper->escapeHtml($d['tokens'] >= 1000 ? round($d['tokens'] / 1000, 1) . 'k' : (string)$d['tokens']) : '' ?></b>
+                        <i class="tok" style="height: <?= (int)round(100 * $d['tokens'] / $maxTokens) ?>%"></i>
+                        <span><?= $escaper->escapeHtml(date('d M', strtotime($d['date']))) ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div class="wb-db__panel">
+            <h3><?= $escaper->escapeHtml(__('Usage and cost by provider (14 days)')) ?></h3>
+            <table class="wb-db__table">
+                <tr><th><?= $escaper->escapeHtml(__('Provider')) ?></th><th class="num"><?= $escaper->escapeHtml(__('Replies')) ?></th><th class="num"><?= $escaper->escapeHtml(__('Tokens')) ?></th><th class="num"><?= $escaper->escapeHtml(__('Cost (USD)')) ?></th></tr>
+                <?php foreach ($block->getCostByCredential(14) as $row): ?>
+                    <tr><td><?= $escaper->escapeHtml($row['label']) ?></td><td class="num"><?= (int)$row['messages'] ?></td><td class="num"><?= number_format((int)$row['tokens']) ?></td><td class="num"><?= number_format((float)$row['cost'], 4) ?></td></tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+        <div class="wb-db__panel">
+            <h3><?= $escaper->escapeHtml(__('Most asked')) ?></h3>
+            <table class="wb-db__table">
+                <?php foreach ($block->getTopQuestions() as $row): ?>
+                    <tr><td><?= $escaper->escapeHtml($row['content']) ?></td><td class="num"><?= (int)$row['cnt'] ?>×</td></tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    </div>
+    <div>
+        <div class="wb-db__panel wb-db__engine">
+            <h3><?= $escaper->escapeHtml(__('Engine')) ?></h3>
+            <dl>
+                <dt><?= $escaper->escapeHtml(__('Storefront widget')) ?></dt><dd class="<?= $engine['enabled'] ? 'wb-db__ok' : 'wb-db__warn' ?>"><?= $engine['enabled'] ? $escaper->escapeHtml(__('Enabled')) : $escaper->escapeHtml(__('Disabled')) ?></dd>
+                <dt><?= $escaper->escapeHtml(__('Configured mode')) ?></dt><dd><?= $escaper->escapeHtml(ucfirst($engine['mode'])) ?></dd>
+                <dt><?= $escaper->escapeHtml(__('AI right now')) ?></dt><dd class="<?= $engine['ai_available'] ? 'wb-db__ok' : 'wb-db__warn' ?>"><?= $engine['ai_available'] ? $escaper->escapeHtml(__('Available - %1', $engine['first'])) : $escaper->escapeHtml(__('Not available - Assist mode (%1 usable credential(s))', $engine['candidates'])) ?></dd>
+                <dt><?= $escaper->escapeHtml(__('Knowledge base')) ?></dt><dd><?= $escaper->escapeHtml(__('%1 documents, %2 pending, %3 chunks (%4 embedded)', $engine['kb']['documents'], $engine['kb']['pending'], $engine['kb']['chunks'], $engine['kb']['embedded'])) ?></dd>
+                <dt><?= $escaper->escapeHtml(__('Escalated to humans, 7 days')) ?></dt><dd><?= (int)$s['escalated'] ?></dd>
+            </dl>
+            <p style="margin:12px 0 0;font-size:13px">
+                <a href="<?= $escaper->escapeUrl($block->url('wb_aichatbot/conversation/index')) ?>"><?= $escaper->escapeHtml(__('Conversations')) ?></a> ·
+                <a href="<?= $escaper->escapeUrl($block->url('wb_aichatbot/request/index')) ?>"><?= $escaper->escapeHtml(__('Support requests')) ?></a> ·
+                <a href="<?= $escaper->escapeUrl($block->url('wb_aichatbot/unanswered/index')) ?>"><?= $escaper->escapeHtml(__('Unanswered')) ?></a> ·
+                <a href="<?= $escaper->escapeUrl($block->url('wb_aichatbot/credential/index')) ?>"><?= $escaper->escapeHtml(__('AI providers')) ?></a> ·
+                <a href="<?= $escaper->escapeUrl($block->url('wb_aichatbot/preview/index')) ?>"><?= $escaper->escapeHtml(__('Preview chat')) ?></a>
+            </p>
+        </div>
+    </div>
+</div>

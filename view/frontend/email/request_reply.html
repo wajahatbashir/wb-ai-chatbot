@@ -1,0 +1,25 @@
+<!--@subject {{trans "Re: %subject (%code)" subject=$subject code=$code}} @-->
+<!--@vars {
+"var code":"Request Code",
+"var subject":"Subject",
+"var message":"Original Message",
+"var reply":"Reply",
+"var customer_name":"Customer Name",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td style="padding:20px 0;">
+            <p style="margin:0 0 16px 0;">{{trans "Dear %name," name=$customer_name}}</p>
+            <p style="margin:0 0 16px 0; white-space:pre-line;">{{var reply}}</p>
+            <p style="margin:24px 0 8px 0; color:#757575; font-size:12px;">{{trans "Your request %code:" code=$code}}</p>
+            <p style="margin:0 0 16px 0; padding:10px 14px; border-left:3px solid #ddd; color:#555; white-space:pre-line;">{{var message}}</p>
+            <p style="margin:0;">{{var store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

@@ -1,0 +1,36 @@
+<!--@subject {{trans "[Chatbot] AI provider \"%alias\" failed: %status" alias=$alias status=$status}} @-->
+<!--@vars {
+"var alias":"Credential Alias",
+"var provider":"Provider",
+"var model":"Model",
+"var status":"Status Code",
+"var error":"Error Message",
+"var permanent":"Permanent Failure",
+"var any_left":"Other Credentials Usable",
+"var store_name":"Store Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td style="padding:20px 0;">
+            <p style="margin:0 0 16px 0;">{{trans "The AI chatbot could not use one of its provider credentials."}}</p>
+            <table cellspacing="0" cellpadding="0" border="0" style="width:100%; border-collapse:collapse; margin-bottom:24px;">
+                <tr style="background-color:#f5f5f5;"><td style="padding:10px 14px; border:1px solid #ddd; font-weight:bold; width:35%;">{{trans "Credential"}}</td><td style="padding:10px 14px; border:1px solid #ddd;">{{var alias}} ({{var provider}}, {{var model}})</td></tr>
+                <tr><td style="padding:10px 14px; border:1px solid #ddd; font-weight:bold;">{{trans "Status"}}</td><td style="padding:10px 14px; border:1px solid #ddd;">{{var status}}</td></tr>
+                <tr><td style="padding:10px 14px; border:1px solid #ddd; font-weight:bold; vertical-align:top;">{{trans "Error"}}</td><td style="padding:10px 14px; border:1px solid #ddd; white-space:pre-line;">{{var error}}</td></tr>
+            </table>
+            {{depend permanent}}
+            <p style="margin:0 0 16px 0;">{{trans "This looks permanent (invalid key or unavailable model). The credential stays excluded until you save it again in AI Chatbot > AI Providers."}}</p>
+            {{/depend}}
+            {{if any_left}}
+            <p style="margin:0;">{{trans "Another credential in the fallback chain is still usable, so customers continue to get AI answers."}}</p>
+            {{else}}
+            <p style="margin:0;"><strong>{{trans "No AI credential is usable right now - the chatbot is serving customers in Assist mode (products, orders, policies still work) until a provider recovers or you fix the key."}}</strong></p>
+            {{/if}}
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

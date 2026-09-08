@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+    <consumer name="wbAichatbotKbIndex" queue="wb_aichatbot_kb_index" connection="db" maxMessages="500"
+              handler="WB\AiChatbot\Model\Kb\Queue\Consumer::process"/>
+</config>

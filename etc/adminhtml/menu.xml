@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="WB_AiChatbot::menu" title="AI Chatbot" translate="title" module="WB_AiChatbot" sortOrder="55" resource="WB_AiChatbot::menu"/>
+        <add id="WB_AiChatbot::dashboard" title="Dashboard" translate="title" module="WB_AiChatbot" sortOrder="10" parent="WB_AiChatbot::menu" action="wb_aichatbot/dashboard/index" resource="WB_AiChatbot::dashboard"/>
+        <add id="WB_AiChatbot::conversations" title="Conversations" translate="title" module="WB_AiChatbot" sortOrder="20" parent="WB_AiChatbot::menu" action="wb_aichatbot/conversation/index" resource="WB_AiChatbot::conversations"/>
+        <add id="WB_AiChatbot::knowledge" title="Knowledge Base" translate="title" module="WB_AiChatbot" sortOrder="30" parent="WB_AiChatbot::menu" action="wb_aichatbot/knowledge/index" resource="WB_AiChatbot::knowledge"/>
+        <add id="WB_AiChatbot::qa" title="Q&amp;A Pairs" translate="title" module="WB_AiChatbot" sortOrder="40" parent="WB_AiChatbot::menu" action="wb_aichatbot/qa/index" resource="WB_AiChatbot::qa"/>
+        <add id="WB_AiChatbot::intents" title="Intent Dictionaries" translate="title" module="WB_AiChatbot" sortOrder="45" parent="WB_AiChatbot::menu" action="wb_aichatbot/intent/index" resource="WB_AiChatbot::intents"/>
+        <add id="WB_AiChatbot::guidance" title="Guidance Rules" translate="title" module="WB_AiChatbot" sortOrder="50" parent="WB_AiChatbot::menu" action="wb_aichatbot/guidance/index" resource="WB_AiChatbot::guidance"/>
+        <add id="WB_AiChatbot::unanswered" title="Unanswered Questions" translate="title" module="WB_AiChatbot" sortOrder="60" parent="WB_AiChatbot::menu" action="wb_aichatbot/unanswered/index" resource="WB_AiChatbot::unanswered"/>
+        <add id="WB_AiChatbot::requests" title="Support Requests" translate="title" module="WB_AiChatbot" sortOrder="70" parent="WB_AiChatbot::menu" action="wb_aichatbot/request/index" resource="WB_AiChatbot::requests"/>
+        <add id="WB_AiChatbot::credentials" title="AI Providers" translate="title" module="WB_AiChatbot" sortOrder="80" parent="WB_AiChatbot::menu" action="wb_aichatbot/credential/index" resource="WB_AiChatbot::credentials"/>
+        <add id="WB_AiChatbot::preview" title="Preview Chat" translate="title" module="WB_AiChatbot" sortOrder="90" parent="WB_AiChatbot::menu" action="wb_aichatbot/preview/index" resource="WB_AiChatbot::preview"/>
+        <add id="WB_AiChatbot::configuration" title="Configuration" translate="title" module="WB_AiChatbot" sortOrder="100" parent="WB_AiChatbot::menu" action="adminhtml/system_config/edit/section/wb_aichatbot" resource="WB_AiChatbot::config"/>
+        <add id="WB_AiChatbot::manual" title="User Manual" translate="title" module="WB_AiChatbot" sortOrder="110" parent="WB_AiChatbot::menu" action="wb_aichatbot/manual/index" resource="WB_AiChatbot::manual"/>
+    </menu>
+</config>

@@ -1,0 +1,156 @@
+<?xml version="1.0" ?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">wb_aichatbot_request_listing.wb_aichatbot_request_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>wb_aichatbot_request_listing_columns</spinner>
+        <deps><dep>wb_aichatbot_request_listing.wb_aichatbot_request_listing_data_source</dep></deps>
+    </settings>
+    <dataSource name="wb_aichatbot_request_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig><param name="indexField" xsi:type="string">request_id</param></storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>WB_AiChatbot::requests</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="wb_aichatbot_request_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>request_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings><sticky>true</sticky></settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filterSearch name="fulltext"/>
+        <filters name="listing_filters"/>
+        <massaction name="listing_massaction">
+            <action name="status_in_progress">
+                <settings>
+                    <url path="wb_aichatbot/request/massStatus"><param name="status">in_progress</param></url>
+                    <type>status_in_progress</type>
+                    <label translate="true">Mark in progress</label>
+                </settings>
+            </action>
+            <action name="status_resolved">
+                <settings>
+                    <url path="wb_aichatbot/request/massStatus"><param name="status">resolved</param></url>
+                    <type>status_resolved</type>
+                    <label translate="true">Mark resolved</label>
+                </settings>
+            </action>
+            <action name="status_closed">
+                <settings>
+                    <url path="wb_aichatbot/request/massStatus"><param name="status">closed</param></url>
+                    <type>status_closed</type>
+                    <label translate="true">Mark closed</label>
+                </settings>
+            </action>
+            <action name="delete">
+                <settings>
+                    <url path="wb_aichatbot/request/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                    <confirm><title translate="true">Delete</title><message translate="true">Delete the selected requests?</message></confirm>
+                </settings>
+            </action>
+        </massaction>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="wb_aichatbot_request_listing_columns">
+        <selectionsColumn name="ids">
+            <settings><indexField>request_id</indexField></settings>
+        </selectionsColumn>
+        <column name="request_id">
+            <settings>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="code">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Code</label>
+            </settings>
+        </column>
+        <column name="status" component="Magento_Ui/js/grid/columns/select">
+            <settings>
+                <filter>select</filter>
+                <options class="WB\AiChatbot\Model\Source\RequestStatus"/>
+                <dataType>select</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="subject">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Subject</label>
+            </settings>
+        </column>
+        <column name="email">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Email</label>
+            </settings>
+        </column>
+        <column name="name">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+        <column name="order_increment_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Order #</label>
+            </settings>
+        </column>
+        <column name="store_id">
+            <settings>
+                <filter>textRange</filter>
+                <visible>false</visible>
+                <label translate="true">Store</label>
+            </settings>
+        </column>
+        <column name="conversation_id">
+            <settings>
+                <filter>textRange</filter>
+                <visible>false</visible>
+                <label translate="true">Conversation</label>
+            </settings>
+        </column>
+        <column name="created_at" component="Magento_Ui/js/grid/columns/date" class="Magento\Ui\Component\Listing\Columns\Date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Created</label>
+            </settings>
+        </column>
+        <column name="replied_at" component="Magento_Ui/js/grid/columns/date" class="Magento\Ui\Component\Listing\Columns\Date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Replied</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="WB\AiChatbot\Ui\Component\Listing\Columns\RowActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="route" xsi:type="string">wb_aichatbot/request</item>
+                    <item name="id_field" xsi:type="string">request_id</item>
+                        <item name="edit_label" xsi:type="string">View / reply</item>
+                </item>
+            </argument>
+            <settings>
+                <indexField>request_id</indexField>
+                <resizeEnabled>false</resizeEnabled>
+                <resizeDefaultWidth>107</resizeDefaultWidth>
+            </settings>
+        </actionsColumn>
+    </columns>
+</listing>

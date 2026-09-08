@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <!-- Full knowledge base sync + index of anything pending, nightly at 02:30 -->
+        <job name="wb_aichatbot_kb_sync" instance="WB\AiChatbot\Cron\KbSync" method="execute">
+            <schedule>30 2 * * *</schedule>
+        </job>
+        <!-- Catch-up indexing every 15 minutes for documents the queue consumer did not reach -->
+        <job name="wb_aichatbot_kb_index_pending" instance="WB\AiChatbot\Cron\KbIndexPending" method="execute">
+            <schedule>*/15 * * * *</schedule>
+        </job>
+        <!-- Retention: old conversations/questions, spent verification codes, stale rate-limit counters -->
+        <job name="wb_aichatbot_retention" instance="WB\AiChatbot\Cron\Retention" method="execute">
+            <schedule>10 3 * * *</schedule>
+        </job>
+    </group>
+</config>

@@ -1,0 +1,17 @@
+{
+    "name": "wb/ai-chatbot",
+    "description": "Magento 2 AI Chatbot - self-contained AI shopping assistant with a key-less Assist mode",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "require": {
+        "php": "~8.1.0||~8.2.0||~8.3.0"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "WB\\AiChatbot\\": ""
+        }
+    }
+}

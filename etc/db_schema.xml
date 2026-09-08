@@ -1,0 +1,304 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!-- AI provider credentials: ordered fallback chain of encrypted API keys -->
+    <table name="wb_aichatbot_credential" resource="default" engine="innodb" comment="WB AI Chatbot Provider Credentials">
+        <column xsi:type="int" name="credential_id" unsigned="true" nullable="false" identity="true" comment="Credential ID"/>
+        <column xsi:type="varchar" name="alias" length="64" nullable="false" comment="Alias"/>
+        <column xsi:type="varchar" name="provider_code" length="32" nullable="false" comment="Provider Code (openai, anthropic, gemini, xai, mock)"/>
+        <column xsi:type="text" name="api_key" nullable="true" comment="API Key (encrypted)"/>
+        <column xsi:type="varchar" name="model" length="128" nullable="true" comment="Chat Model"/>
+        <column xsi:type="varchar" name="embedding_model" length="128" nullable="true" comment="Embedding Model"/>
+        <column xsi:type="smallint" name="supports_vision" unsigned="true" nullable="false" default="0" comment="Supports Vision"/>
+        <column xsi:type="int" name="sort_order" nullable="false" default="0" comment="Fallback Order"/>
+        <column xsi:type="smallint" name="is_enabled" unsigned="true" nullable="false" default="1" comment="Is Enabled"/>
+        <column xsi:type="varchar" name="status" length="32" nullable="false" default="UNCHECKED" comment="Health Status"/>
+        <column xsi:type="text" name="status_message" nullable="true" comment="Health Status Message"/>
+        <column xsi:type="datetime" name="last_checked_at" nullable="true" comment="Last Health Check"/>
+        <column xsi:type="datetime" name="last_error_at" nullable="true" comment="Last Error"/>
+        <column xsi:type="datetime" name="retry_after" nullable="true" comment="Do not retry before"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="credential_id"/>
+        </constraint>
+        <index referenceId="WB_AICHATBOT_CREDENTIAL_ENABLED_SORT" indexType="btree">
+            <column name="is_enabled"/>
+            <column name="sort_order"/>
+        </index>
+    </table>
+
+    <!-- Knowledge base -->
+    <table name="wb_aichatbot_kb_category" resource="default" engine="innodb" comment="WB AI Chatbot KB Categories">
+        <column xsi:type="int" name="category_id" unsigned="true" nullable="false" identity="true" comment="Category ID"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="false" comment="Name"/>
+        <column xsi:type="varchar" name="identifier" length="128" nullable="false" comment="Identifier"/>
+        <column xsi:type="int" name="parent_id" unsigned="true" nullable="true" comment="Parent Category ID"/>
+        <column xsi:type="text" name="description" nullable="true" comment="Description"/>
+        <column xsi:type="smallint" name="is_visible" unsigned="true" nullable="false" default="1" comment="Is Visible"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="category_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="WB_AICHATBOT_KB_CATEGORY_IDENTIFIER">
+            <column name="identifier"/>
+        </constraint>
+    </table>
+
+    <table name="wb_aichatbot_kb_document" resource="default" engine="innodb" comment="WB AI Chatbot KB Documents">
+        <column xsi:type="int" name="document_id" unsigned="true" nullable="false" identity="true" comment="Document ID"/>
+        <column xsi:type="varchar" name="identifier" length="191" nullable="false" comment="Identifier (e.g. product.123)"/>
+        <column xsi:type="varchar" name="source_type" length="32" nullable="false" comment="Source Type"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="category_id" unsigned="true" nullable="true" comment="KB Category ID"/>
+        <column xsi:type="varchar" name="title" length="255" nullable="false" comment="Title"/>
+        <column xsi:type="mediumtext" name="body" nullable="true" comment="Body"/>
+        <column xsi:type="varchar" name="url" length="512" nullable="true" comment="URL"/>
+        <column xsi:type="text" name="attributes" nullable="true" comment="Attributes (JSON)"/>
+        <column xsi:type="varchar" name="content_hash" length="64" nullable="true" comment="Content Hash"/>
+        <column xsi:type="smallint" name="is_enabled" unsigned="true" nullable="false" default="1" comment="Is Enabled"/>
+        <column xsi:type="varchar" name="sync_status" length="32" nullable="false" default="pending" comment="Sync Status (pending, indexed, dirty, failed)"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="document_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="WB_AICHATBOT_KB_DOCUMENT_IDENTIFIER_STORE">
+            <column name="identifier"/>
+            <column name="store_id"/>
+        </constraint>
+        <index referenceId="WB_AICHATBOT_KB_DOCUMENT_SOURCE_STATUS" indexType="btree">
+            <column name="source_type"/>
+            <column name="sync_status"/>
+        </index>
+        <index referenceId="WB_AICHATBOT_KB_DOCUMENT_TITLE_BODY" indexType="fulltext">
+            <column name="title"/>
+            <column name="body"/>
+        </index>
+    </table>
+
+    <table name="wb_aichatbot_kb_chunk" resource="default" engine="innodb" comment="WB AI Chatbot KB Chunks">
+        <column xsi:type="int" name="chunk_id" unsigned="true" nullable="false" identity="true" comment="Chunk ID"/>
+        <column xsi:type="int" name="document_id" unsigned="true" nullable="false" comment="Document ID"/>
+        <column xsi:type="smallint" name="chunk_index" unsigned="true" nullable="false" default="0" comment="Chunk Index"/>
+        <column xsi:type="text" name="text" nullable="false" comment="Chunk Text"/>
+        <column xsi:type="int" name="token_count" unsigned="true" nullable="false" default="0" comment="Token Count"/>
+        <column xsi:type="mediumblob" name="embedding" nullable="true" comment="Embedding (packed float32)"/>
+        <column xsi:type="varchar" name="embedding_model" length="128" nullable="true" comment="Embedding Model"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="chunk_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="WB_AICHATBOT_KB_CHUNK_DOCUMENT_ID" table="wb_aichatbot_kb_chunk" column="document_id" referenceTable="wb_aichatbot_kb_document" referenceColumn="document_id" onDelete="CASCADE"/>
+        <index referenceId="WB_AICHATBOT_KB_CHUNK_TEXT" indexType="fulltext">
+            <column name="text"/>
+        </index>
+    </table>
+
+    <!-- Admin-written Q&A pairs, matched before any AI call -->
+    <table name="wb_aichatbot_qa" resource="default" engine="innodb" comment="WB AI Chatbot Q&amp;A Pairs">
+        <column xsi:type="int" name="qa_id" unsigned="true" nullable="false" identity="true" comment="Q&amp;A ID"/>
+        <column xsi:type="varchar" name="question" length="500" nullable="false" comment="Question"/>
+        <column xsi:type="text" name="alternatives" nullable="true" comment="Alternative Phrasings (one per line)"/>
+        <column xsi:type="text" name="answer" nullable="false" comment="Answer (Markdown)"/>
+        <column xsi:type="int" name="document_id" unsigned="true" nullable="true" comment="Linked KB Document"/>
+        <column xsi:type="varchar" name="url" length="512" nullable="true" comment="Read More URL"/>
+        <column xsi:type="varchar" name="store_ids" length="255" nullable="true" comment="Store IDs (CSV, empty = all)"/>
+        <column xsi:type="smallint" name="is_enabled" unsigned="true" nullable="false" default="1" comment="Is Enabled"/>
+        <column xsi:type="int" name="hits" unsigned="true" nullable="false" default="0" comment="Times Used"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="qa_id"/>
+        </constraint>
+        <index referenceId="WB_AICHATBOT_QA_QUESTION_ALTERNATIVES" indexType="fulltext">
+            <column name="question"/>
+            <column name="alternatives"/>
+        </index>
+    </table>
+
+    <!-- Assist-mode intent dictionaries -->
+    <table name="wb_aichatbot_intent" resource="default" engine="innodb" comment="WB AI Chatbot Intent Dictionaries">
+        <column xsi:type="int" name="intent_id" unsigned="true" nullable="false" identity="true" comment="Intent ID"/>
+        <column xsi:type="varchar" name="intent_code" length="32" nullable="false" comment="Intent Code"/>
+        <column xsi:type="varchar" name="language" length="8" nullable="false" default="en" comment="Language"/>
+        <column xsi:type="text" name="keywords" nullable="false" comment="Keywords / patterns (one per line)"/>
+        <column xsi:type="int" name="priority" nullable="false" default="0" comment="Priority"/>
+        <column xsi:type="smallint" name="is_enabled" unsigned="true" nullable="false" default="1" comment="Is Enabled"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="intent_id"/>
+        </constraint>
+        <index referenceId="WB_AICHATBOT_INTENT_CODE_LANG" indexType="btree">
+            <column name="intent_code"/>
+            <column name="language"/>
+        </index>
+    </table>
+
+    <!-- Guidance rules appended to the system prompt -->
+    <table name="wb_aichatbot_guidance" resource="default" engine="innodb" comment="WB AI Chatbot Guidance Rules">
+        <column xsi:type="int" name="guidance_id" unsigned="true" nullable="false" identity="true" comment="Guidance ID"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="false" comment="Name"/>
+        <column xsi:type="text" name="trigger_description" nullable="false" comment="Trigger (intent description)"/>
+        <column xsi:type="text" name="instructions" nullable="false" comment="Instructions"/>
+        <column xsi:type="varchar" name="status" length="16" nullable="false" default="enabled" comment="Status (enabled, disabled, testing)"/>
+        <column xsi:type="int" name="sort_order" nullable="false" default="0" comment="Sort Order"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="guidance_id"/>
+        </constraint>
+    </table>
+
+    <!-- Conversations and messages -->
+    <table name="wb_aichatbot_conversation" resource="default" engine="innodb" comment="WB AI Chatbot Conversations">
+        <column xsi:type="int" name="conversation_id" unsigned="true" nullable="false" identity="true" comment="Conversation ID"/>
+        <column xsi:type="varchar" name="session_hash" length="64" nullable="false" comment="Session Hash"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="true" comment="Customer ID"/>
+        <column xsi:type="varchar" name="customer_email" length="255" nullable="true" comment="Customer Email"/>
+        <column xsi:type="varchar" name="visitor_name" length="255" nullable="true" comment="Visitor Name"/>
+        <column xsi:type="varchar" name="language" length="8" nullable="true" comment="Language"/>
+        <column xsi:type="varchar" name="country" length="2" nullable="true" comment="Country"/>
+        <column xsi:type="varchar" name="ip_hash" length="64" nullable="true" comment="IP Hash"/>
+        <column xsi:type="varchar" name="page_url_first" length="512" nullable="true" comment="First Page URL"/>
+        <column xsi:type="int" name="pages_count" unsigned="true" nullable="false" default="1" comment="Pages Count"/>
+        <column xsi:type="int" name="messages_count" unsigned="true" nullable="false" default="0" comment="Messages Count"/>
+        <column xsi:type="int" name="prompt_tokens" unsigned="true" nullable="false" default="0" comment="Prompt Tokens"/>
+        <column xsi:type="int" name="completion_tokens" unsigned="true" nullable="false" default="0" comment="Completion Tokens"/>
+        <column xsi:type="decimal" name="cost" scale="6" precision="12" nullable="false" default="0" comment="Cost (USD)"/>
+        <column xsi:type="varchar" name="mode" length="16" nullable="false" default="assist" comment="Last Engine Mode (ai, assist)"/>
+        <column xsi:type="varchar" name="status" length="16" nullable="false" default="open" comment="Status (open, closed, escalated)"/>
+        <column xsi:type="smallint" name="rating" unsigned="true" nullable="true" comment="Rating 1-5"/>
+        <column xsi:type="text" name="rating_comment" nullable="true" comment="Rating Comment"/>
+        <column xsi:type="text" name="verified_emails" nullable="true" comment="Verified Emails (JSON)"/>
+        <column xsi:type="text" name="flow_state" nullable="true" comment="Guided Flow State (JSON)"/>
+        <column xsi:type="varchar" name="title" length="255" nullable="true" comment="Title (first question)"/>
+        <column xsi:type="smallint" name="is_preview" unsigned="true" nullable="false" default="0" comment="Admin Preview"/>
+        <column xsi:type="timestamp" name="started_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Started At"/>
+        <column xsi:type="timestamp" name="last_message_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Last Message At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="conversation_id"/>
+        </constraint>
+        <index referenceId="WB_AICHATBOT_CONVERSATION_SESSION" indexType="btree">
+            <column name="session_hash"/>
+        </index>
+        <index referenceId="WB_AICHATBOT_CONVERSATION_STARTED" indexType="btree">
+            <column name="started_at"/>
+        </index>
+    </table>
+
+    <table name="wb_aichatbot_message" resource="default" engine="innodb" comment="WB AI Chatbot Messages">
+        <column xsi:type="int" name="message_id" unsigned="true" nullable="false" identity="true" comment="Message ID"/>
+        <column xsi:type="int" name="conversation_id" unsigned="true" nullable="false" comment="Conversation ID"/>
+        <column xsi:type="varchar" name="role" length="16" nullable="false" comment="Role (user, assistant, tool, system)"/>
+        <column xsi:type="mediumtext" name="content" nullable="true" comment="Content"/>
+        <column xsi:type="text" name="attachments" nullable="true" comment="Attachments (JSON)"/>
+        <column xsi:type="text" name="tool_calls" nullable="true" comment="Tool Calls (JSON)"/>
+        <column xsi:type="mediumtext" name="tool_results" nullable="true" comment="Tool Results (JSON)"/>
+        <column xsi:type="text" name="cards" nullable="true" comment="Rendered Cards (JSON)"/>
+        <column xsi:type="text" name="sources" nullable="true" comment="Retrieved Sources (JSON)"/>
+        <column xsi:type="int" name="credential_id" unsigned="true" nullable="true" comment="Credential ID"/>
+        <column xsi:type="varchar" name="model" length="128" nullable="true" comment="Model"/>
+        <column xsi:type="varchar" name="mode" length="16" nullable="false" default="assist" comment="Engine Mode"/>
+        <column xsi:type="int" name="prompt_tokens" unsigned="true" nullable="false" default="0" comment="Prompt Tokens"/>
+        <column xsi:type="int" name="completion_tokens" unsigned="true" nullable="false" default="0" comment="Completion Tokens"/>
+        <column xsi:type="int" name="latency_ms" unsigned="true" nullable="false" default="0" comment="Latency (ms)"/>
+        <column xsi:type="smallint" name="was_grounded" unsigned="true" nullable="false" default="0" comment="Grounded"/>
+        <column xsi:type="smallint" name="feedback" nullable="true" comment="Feedback (1 up, -1 down)"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="message_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="WB_AICHATBOT_MESSAGE_CONVERSATION_ID" table="wb_aichatbot_message" column="conversation_id" referenceTable="wb_aichatbot_conversation" referenceColumn="conversation_id" onDelete="CASCADE"/>
+        <index referenceId="WB_AICHATBOT_MESSAGE_CONVERSATION_CREATED" indexType="btree">
+            <column name="conversation_id"/>
+            <column name="created_at"/>
+        </index>
+    </table>
+
+    <!-- Email verification codes for guest self-service -->
+    <table name="wb_aichatbot_verification_code" resource="default" engine="innodb" comment="WB AI Chatbot Verification Codes">
+        <column xsi:type="int" name="code_id" unsigned="true" nullable="false" identity="true" comment="Code ID"/>
+        <column xsi:type="varchar" name="email" length="255" nullable="false" comment="Email"/>
+        <column xsi:type="varchar" name="code_hash" length="128" nullable="false" comment="Code Hash"/>
+        <column xsi:type="int" name="conversation_id" unsigned="true" nullable="true" comment="Conversation ID"/>
+        <column xsi:type="varchar" name="ip_hash" length="64" nullable="true" comment="IP Hash"/>
+        <column xsi:type="smallint" name="attempts" unsigned="true" nullable="false" default="0" comment="Attempts"/>
+        <column xsi:type="datetime" name="expires_at" nullable="false" comment="Expires At"/>
+        <column xsi:type="datetime" name="used_at" nullable="true" comment="Used At"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="code_id"/>
+        </constraint>
+        <index referenceId="WB_AICHATBOT_VERIFICATION_EMAIL_CREATED" indexType="btree">
+            <column name="email"/>
+            <column name="created_at"/>
+        </index>
+    </table>
+
+    <!-- Unanswered questions queue -->
+    <table name="wb_aichatbot_unanswered" resource="default" engine="innodb" comment="WB AI Chatbot Unanswered Questions">
+        <column xsi:type="int" name="unanswered_id" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="conversation_id" unsigned="true" nullable="true" comment="Conversation ID"/>
+        <column xsi:type="int" name="message_id" unsigned="true" nullable="true" comment="Message ID"/>
+        <column xsi:type="text" name="question" nullable="false" comment="Question"/>
+        <column xsi:type="varchar" name="language" length="8" nullable="true" comment="Language"/>
+        <column xsi:type="decimal" name="retrieval_score" scale="4" precision="8" nullable="true" comment="Best Retrieval Score"/>
+        <column xsi:type="varchar" name="status" length="16" nullable="false" default="new" comment="Status (new, answered, ignored)"/>
+        <column xsi:type="int" name="resolved_document_id" unsigned="true" nullable="true" comment="Resolved Document ID"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="unanswered_id"/>
+        </constraint>
+    </table>
+
+    <!-- Built-in support requests (tickets) -->
+    <table name="wb_aichatbot_request" resource="default" engine="innodb" comment="WB AI Chatbot Support Requests">
+        <column xsi:type="int" name="request_id" unsigned="true" nullable="false" identity="true" comment="Request ID"/>
+        <column xsi:type="varchar" name="code" length="32" nullable="false" comment="Public Code"/>
+        <column xsi:type="int" name="conversation_id" unsigned="true" nullable="true" comment="Conversation ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
+        <column xsi:type="varchar" name="email" length="255" nullable="false" comment="Email"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="true" comment="Name"/>
+        <column xsi:type="varchar" name="subject" length="255" nullable="false" comment="Subject"/>
+        <column xsi:type="text" name="message" nullable="false" comment="Message"/>
+        <column xsi:type="varchar" name="order_increment_id" length="50" nullable="true" comment="Order Increment ID"/>
+        <column xsi:type="varchar" name="status" length="16" nullable="false" default="new" comment="Status (new, in_progress, resolved, closed)"/>
+        <column xsi:type="text" name="admin_reply" nullable="true" comment="Admin Reply"/>
+        <column xsi:type="datetime" name="replied_at" nullable="true" comment="Replied At"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="request_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="WB_AICHATBOT_REQUEST_CODE">
+            <column name="code"/>
+        </constraint>
+        <index referenceId="WB_AICHATBOT_REQUEST_EMAIL" indexType="btree">
+            <column name="email"/>
+        </index>
+    </table>
+
+    <!-- Rate limiting counters -->
+    <table name="wb_aichatbot_rate_limit" resource="default" engine="innodb" comment="WB AI Chatbot Rate Limits">
+        <column xsi:type="varchar" name="limit_key" length="128" nullable="false" comment="Limit Key"/>
+        <column xsi:type="datetime" name="window_start" nullable="false" comment="Window Start"/>
+        <column xsi:type="int" name="count" unsigned="true" nullable="false" default="0" comment="Count"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="limit_key"/>
+        </constraint>
+    </table>
+
+    <!-- Daily usage rollup for the dashboard -->
+    <table name="wb_aichatbot_daily_usage" resource="default" engine="innodb" comment="WB AI Chatbot Daily Usage">
+        <column xsi:type="date" name="usage_date" nullable="false" comment="Date"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0" comment="Store ID"/>
+        <column xsi:type="int" name="credential_id" unsigned="true" nullable="false" default="0" comment="Credential ID (0 = assist mode)"/>
+        <column xsi:type="int" name="conversations" unsigned="true" nullable="false" default="0" comment="Conversations"/>
+        <column xsi:type="int" name="messages" unsigned="true" nullable="false" default="0" comment="Messages"/>
+        <column xsi:type="int" name="prompt_tokens" unsigned="true" nullable="false" default="0" comment="Prompt Tokens"/>
+        <column xsi:type="int" name="completion_tokens" unsigned="true" nullable="false" default="0" comment="Completion Tokens"/>
+        <column xsi:type="decimal" name="cost" scale="6" precision="12" nullable="false" default="0" comment="Cost (USD)"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="usage_date"/>
+            <column name="store_id"/>
+            <column name="credential_id"/>
+        </constraint>
+    </table>
+</schema>

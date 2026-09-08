@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="wb_aichatbot_notifications_template_verification" label="AI Chatbot - Verification Code" file="verification_code.html" type="html" module="WB_AiChatbot" area="frontend"/>
+    <template id="wb_aichatbot_notifications_template_request_confirmation" label="AI Chatbot - Support Request Confirmation" file="request_confirmation.html" type="html" module="WB_AiChatbot" area="frontend"/>
+    <template id="wb_aichatbot_notifications_template_request_admin" label="AI Chatbot - New Support Request (Admin)" file="request_admin.html" type="html" module="WB_AiChatbot" area="frontend"/>
+    <template id="wb_aichatbot_notifications_template_provider_failure" label="AI Chatbot - Provider Failure (Admin)" file="provider_failure.html" type="html" module="WB_AiChatbot" area="frontend"/>
+    <template id="wb_aichatbot_notifications_template_request_reply" label="AI Chatbot - Support Request Reply" file="request_reply.html" type="html" module="WB_AiChatbot" area="frontend"/>
+</config>

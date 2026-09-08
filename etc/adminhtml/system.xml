@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Self-declared so this module still has a tab to sit under when installed on its own. -->
+        <tab id="wajahatbashir" translate="label" sortOrder="100">
+            <label>💻 WB</label>
+        </tab>
+        <section id="wb_aichatbot" translate="label" type="text" sortOrder="240" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>AI Chatbot</label>
+            <tab>wajahatbashir</tab>
+            <resource>WB_AiChatbot::config</resource>
+
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Chatbot</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Master switch for the storefront widget on this scope.</comment>
+                </field>
+                <field id="mode" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Engine Mode</label>
+                    <source_model>WB\AiChatbot\Model\Source\EngineMode</source_model>
+                    <comment>Auto: use AI when a healthy provider key exists, otherwise fall back to Assist mode automatically. Assist only: never call an AI provider (rule-based answers, guided flows, Q&amp;A pairs) - useful to cap spend.</comment>
+                </field>
+                <field id="hide_until_synced" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hide Widget Until Knowledge Base Is Synced</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Keeps the widget off the storefront until at least one knowledge base document is indexed.</comment>
+                </field>
+                <field id="customer_groups" translate="label comment" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Show To Customer Groups</label>
+                    <source_model>Magento\Customer\Model\Config\Source\Group\Multiselect</source_model>
+                    <comment>Leave empty to show to everyone, including guests.</comment>
+                </field>
+            </group>
+
+            <group id="assistant" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Assistant</label>
+                <field id="name" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Assistant Name</label>
+                </field>
+                <field id="welcome_message" translate="label comment" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Welcome Message</label>
+                    <comment>First message shown when a conversation starts.</comment>
+                </field>
+                <field id="default_questions" translate="label comment" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Suggested Questions</label>
+                    <comment>One per line. Shown as quick-reply chips on the Home screen and when the assistant cannot answer.</comment>
+                </field>
+                <field id="preferred_language" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Preferred Language</label>
+                    <comment>Fallback language code (e.g. en). In AI mode the assistant replies in whatever language the customer writes.</comment>
+                </field>
+                <field id="base_prompt" translate="label comment" type="textarea" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base Prompt</label>
+                    <comment>Top-level framing of the assistant's role. Leave empty for the built-in default (recommended).</comment>
+                </field>
+                <field id="instructions" translate="label comment" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Instructions</label>
+                    <comment>Business description, rules, prohibited topics and standing context - e.g. "We ship worldwide; COD is available in Pakistan only."</comment>
+                </field>
+                <field id="tone" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tone Of Voice</label>
+                    <comment>e.g. "warm, concise, premium boutique".</comment>
+                </field>
+                <field id="max_reply_tokens" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Max Reply Tokens</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="temperature" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Temperature</label>
+                    <validate>validate-number validate-number-range number-range-0-2</validate>
+                    <comment>0 = deterministic, 1 = creative. 0.3 recommended for shop assistants.</comment>
+                </field>
+                <field id="max_messages" translate="label comment" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Max Messages Per Conversation</label>
+                    <validate>validate-digits</validate>
+                    <comment>After this many customer messages the assistant offers a support request instead of continuing. 0 = unlimited.</comment>
+                </field>
+                <field id="max_tool_iterations" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Max Tool Calls Per Reply</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+
+            <group id="assist" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Assist Mode (no API key)</label>
+                <field id="show_notice" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show "AI unavailable" Notice</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Shown once per conversation when the engine is running without AI.</comment>
+                </field>
+                <field id="notice_text" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notice Text</label>
+                    <depends><field id="show_notice">1</field></depends>
+                </field>
+                <field id="retry_minutes" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Retry AI After (minutes)</label>
+                    <validate>validate-digits</validate>
+                    <comment>After a provider failure, wait this long before trying that provider again (doubles on each consecutive failure, up to 60).</comment>
+                </field>
+                <field id="max_products" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Max Product Cards Per Reply</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+
+            <group id="widget" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Widget</label>
+                <field id="position" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Position</label>
+                    <source_model>WB\AiChatbot\Model\Source\Position</source_model>
+                </field>
+                <field id="primary_color" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Primary Color</label>
+                    <comment>Hex, e.g. #1b1f1d</comment>
+                </field>
+                <field id="launcher_title" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Launcher Button Label</label>
+                    <comment>Leave empty for an icon-only round button.</comment>
+                </field>
+                <field id="window_title" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Window Title</label>
+                </field>
+                <field id="window_subtitle" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Window Subtitle</label>
+                </field>
+                <field id="avatar" translate="label comment" type="image" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Assistant Avatar</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">wb_aichatbot</upload_dir>
+                    <base_url type="media" scope_info="1">wb_aichatbot</base_url>
+                    <comment>Square image, at least 80x80px. Leave empty for the default icon.</comment>
+                </field>
+                <field id="invitation_message" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Invitation Message</label>
+                    <comment>Small popover next to the launcher inviting the visitor to chat. Leave empty to disable.</comment>
+                </field>
+                <field id="invitation_delay" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Invitation Delay (seconds)</label>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="bottom_offset_mobile" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Mobile Bottom Offset (px)</label>
+                    <validate>validate-digits</validate>
+                    <comment>Lifts the launcher above a sticky bottom navigation on mobile themes.</comment>
+                </field>
+                <field id="sound" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sound On Reply</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="allow_attachments" translate="label comment" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allow Image Attachments</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Lets visitors send a photo to search for similar products (needs a vision-capable AI provider).</comment>
+                </field>
+                <field id="allow_human_handoff" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show "Talk To A Human" Button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="link_target" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Open Links In</label>
+                    <source_model>WB\AiChatbot\Model\Source\LinkTarget</source_model>
+                </field>
+                <field id="excluded_pages" translate="label comment" type="textarea" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Exclude On Pages</label>
+                    <comment>One per line. Either a full action name (e.g. checkout_index_index, onestepcheckout_index_index) or a URL pattern with * wildcards (e.g. /customer/*).</comment>
+                </field>
+                <field id="custom_css" translate="label" type="textarea" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom CSS</label>
+                </field>
+            </group>
+
+            <group id="limits" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Limits &amp; Security</label>
+                <field id="messages_per_minute" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Messages Per Minute (per visitor)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="conversations_per_day" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Conversations Per Day (per IP)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="max_message_length" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Max Message Length (characters)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="codes_per_hour_email" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Verification Codes Per Hour (per email)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="codes_per_hour_ip" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Verification Codes Per Hour (per IP)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="code_ttl_minutes" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Verification Code Lifetime (minutes)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+                <field id="daily_token_budget" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Daily Token Budget</label>
+                    <validate>validate-digits</validate>
+                    <comment>When the day's AI token usage passes this number the engine switches to Assist mode until midnight. 0 = no budget.</comment>
+                </field>
+                <field id="retention_days" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Conversation Retention (days)</label>
+                    <validate>validate-digits</validate>
+                    <comment>Conversations older than this are deleted by cron. 0 = keep forever.</comment>
+                </field>
+                <field id="redact_pii" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Redact Emails/Phones In Stored Transcripts</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Masks email addresses and phone numbers in the message content saved to the database.</comment>
+                </field>
+            </group>
+
+            <group id="notifications" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Notifications</label>
+                <field id="email" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Admin Notification Email</label>
+                    <validate>validate-email</validate>
+                    <comment>Receives new support requests and provider-failure alerts. Defaults to the Contact Us recipient when empty.</comment>
+                </field>
+                <field id="notify_on_provider_failure" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Email When AI Falls Back To Assist Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="notify_on_request" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Email On New Support Request</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="template_verification" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Verification Code Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>To change the wording, copy the template under Marketing &gt; Communications &gt; Email Templates (Load Template: "AI Chatbot - Verification Code"), edit it, then select your copy here.</comment>
+                </field>
+                <field id="template_request_confirmation" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Support Request Confirmation Email (Customer)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="template_request_admin" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>New Support Request Email (Admin)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="template_request_reply" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Support Request Reply Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="template_provider_failure" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Provider Failure Email (Admin)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+            </group>
+
+            <group id="developer" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Developer</label>
+                <field id="debug_log" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Debug Logging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Writes prompts, tool calls and provider responses to var/log/wb_aichatbot.log.</comment>
+                </field>
+                <field id="allow_mock" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Allow Mock Provider</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>The Mock provider answers without any API and is meant for development and tests only.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

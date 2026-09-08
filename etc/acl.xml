@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="WB_AiChatbot::menu" title="AI Chatbot" translate="title" sortOrder="55">
+                    <resource id="WB_AiChatbot::dashboard" title="Dashboard" translate="title" sortOrder="10"/>
+                    <resource id="WB_AiChatbot::conversations" title="Conversations" translate="title" sortOrder="20"/>
+                    <resource id="WB_AiChatbot::knowledge" title="Knowledge Base" translate="title" sortOrder="30"/>
+                    <resource id="WB_AiChatbot::qa" title="Q&amp;A Pairs" translate="title" sortOrder="40"/>
+                    <resource id="WB_AiChatbot::intents" title="Intent Dictionaries" translate="title" sortOrder="45"/>
+                    <resource id="WB_AiChatbot::guidance" title="Guidance Rules" translate="title" sortOrder="50"/>
+                    <resource id="WB_AiChatbot::unanswered" title="Unanswered Questions" translate="title" sortOrder="60"/>
+                    <resource id="WB_AiChatbot::requests" title="Support Requests" translate="title" sortOrder="70"/>
+                    <resource id="WB_AiChatbot::credentials" title="AI Providers" translate="title" sortOrder="80"/>
+                    <resource id="WB_AiChatbot::preview" title="Preview Chat" translate="title" sortOrder="90"/>
+                    <resource id="WB_AiChatbot::manual" title="User Manual" translate="title" sortOrder="110"/>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="WB_AiChatbot::config" title="AI Chatbot Section" translate="title" sortOrder="130"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

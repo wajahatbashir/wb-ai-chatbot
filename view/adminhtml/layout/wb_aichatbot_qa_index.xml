@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="WB\AiChatbot\Block\Adminhtml\GridContainer" name="wb_aichatbot_qa_container">
+                <arguments>
+                    <argument name="header" xsi:type="string">Q&amp;A Pairs</argument>
+                    <argument name="add_route" xsi:type="string">wb_aichatbot/qa/new</argument>
+                    <argument name="add_label" xsi:type="string">Add Q&amp;A Pair</argument>
+                </arguments>
+            </block>
+            <uiComponent name="wb_aichatbot_qa_listing"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="WB\AiChatbot\Block\Adminhtml\FormContainer" name="adminhtml_intent_edit">
+                <arguments>
+                    <argument name="controller" xsi:type="string">adminhtml_intent</argument>
+                    <argument name="id_field" xsi:type="string">intent_id</argument>
+                    <argument name="item_title" xsi:type="string">Intent Dictionary</argument>
+                    <argument name="save_label" xsi:type="string">Save</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

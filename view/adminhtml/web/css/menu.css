@@ -1,0 +1,25 @@
+/*
+ * AI Chatbot top-level admin menu icon - a chat bubble instead of Magento's generic "no icon" glyph.
+ * Deliberately does NOT set width/height/display here: core's `.admin__menu .level-0 > a:before` rule already
+ * makes this pseudo-element a full-width block (display:block, height:2.2rem, margin-bottom:0.3rem, no width -
+ * i.e. auto/100%), and the parent <a> is text-align:center. That's how every other top-level icon gets centered:
+ * a full-width box with centered inline content. Setting an explicit small width here (as an earlier version of
+ * this rule did) shrinks the box itself, so it collapses to the flush-left edge instead - text-align has nothing
+ * left to center. Only `content` and `background` are overridden; the box model is inherited untouched.
+ */
+#menu-wb-aichatbot-menu > a:before {
+    content: '' !important;
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjdmM2ViIiBzdHJva2Utd2lkdGg9IjEuOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjEgMTJhOCA4IDAgMCAxLTggOEg4bC01IDMgMS4yLTQuMkE4IDggMCAxIDEgMjEgMTJ6Ii8+PC9zdmc+') no-repeat center / 20px 20px;
+}
+
+/*
+ * Our "Dashboard" submenu link (route wb_aichatbot/dashboard/index) accidentally matches core Magento's generic
+ * a[href*="dashboard"]:before rule (meant only for the real top-level Dashboard item), which stamped a stray icon
+ * glyph right against the text since submenu links carry no icon spacing. Suppress it so it reads as plain text,
+ * exactly like every other item in this submenu.
+ */
+#menu-wb-aichatbot-menu .submenu a[href*="wb_aichatbot/dashboard"]:before {
+    content: none !important;
+    background: none !important;
+    width: auto !important;
+}

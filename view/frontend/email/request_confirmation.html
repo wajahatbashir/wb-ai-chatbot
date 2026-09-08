@@ -1,0 +1,47 @@
+<!--@subject {{trans "We received your request %code" code=$code}} @-->
+<!--@vars {
+"var code":"Request Code",
+"var subject":"Subject",
+"var message":"Message",
+"var customer_name":"Customer Name",
+"var order_increment_id":"Order Number",
+"var store_name":"Store Name",
+"var store_url":"Store URL"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+        <td style="padding:20px 0;">
+            <p style="margin:0 0 16px 0;">{{trans "Dear %name," name=$customer_name}}</p>
+            <p style="margin:0 0 16px 0;">
+                {{trans "Thank you for contacting %store_name. Your request has been logged under the code <strong>%code</strong>. Our team will reply to this email address." store_name=$store_name code=$code |raw}}
+            </p>
+            <table cellspacing="0" cellpadding="0" border="0" style="width:100%; border-collapse:collapse; margin-bottom:24px;">
+                <tr style="background-color:#f5f5f5;">
+                    <td style="padding:10px 14px; border:1px solid #ddd; font-weight:bold; width:35%;">{{trans "Request code"}}</td>
+                    <td style="padding:10px 14px; border:1px solid #ddd;">{{var code}}</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px 14px; border:1px solid #ddd; font-weight:bold;">{{trans "Subject"}}</td>
+                    <td style="padding:10px 14px; border:1px solid #ddd;">{{var subject}}</td>
+                </tr>
+                {{depend order_increment_id}}
+                <tr>
+                    <td style="padding:10px 14px; border:1px solid #ddd; font-weight:bold;">{{trans "Order"}}</td>
+                    <td style="padding:10px 14px; border:1px solid #ddd;">#{{var order_increment_id}}</td>
+                </tr>
+                {{/depend}}
+                <tr>
+                    <td style="padding:10px 14px; border:1px solid #ddd; font-weight:bold; vertical-align:top;">{{trans "Your message"}}</td>
+                    <td style="padding:10px 14px; border:1px solid #ddd; white-space:pre-line;">{{var message}}</td>
+                </tr>
+            </table>
+            <p style="margin:0 0 16px 0;">{{trans "You can ask the chat assistant on our website for the status of this request at any time using the code above."}}</p>
+            <p style="margin:0;">{{var store_name}}</p>
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

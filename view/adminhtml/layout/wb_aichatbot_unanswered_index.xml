@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="WB\AiChatbot\Block\Adminhtml\GridContainer" name="wb_aichatbot_unanswered_container">
+                <arguments>
+                    <argument name="header" xsi:type="string">Unanswered Questions</argument>
+                </arguments>
+            </block>
+            <uiComponent name="wb_aichatbot_unanswered_listing"/>
+        </referenceContainer>
+    </body>
+</page>

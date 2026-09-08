@@ -1,0 +1,48 @@
+<?php
+/** @var \WB\AiChatbot\Block\Adminhtml\Manual $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<style>
+    .wb-manual { display: flex; gap: 24px; align-items: flex-start; }
+    .wb-manual__nav { flex: 0 0 260px; position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto;
+        background: #fff; border: 1px solid #e3e3e3; border-radius: 8px; padding: 14px 16px; font-size: 13px; }
+    .wb-manual__nav-title { font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: 11px; color: #757575; margin: 0 0 8px; }
+    .wb-manual__nav a { display: block; padding: 4px 0; color: #514943; text-decoration: none; border-bottom: 1px solid transparent; }
+    .wb-manual__nav a:hover { color: #1b1f1d; text-decoration: underline; }
+    .wb-manual__content { flex: 1; min-width: 0; background: #fff; border: 1px solid #e3e3e3; border-radius: 8px; padding: 28px 36px 60px; font-size: 14px; line-height: 1.65; color: #303030; max-width: 900px; }
+    .wb-manual__content h1 { font-size: 26px; margin: 0 0 4px; }
+    .wb-manual__content h2 { font-size: 19px; margin: 40px 0 12px; padding-top: 16px; border-top: 1px solid #eee; }
+    .wb-manual__content h2:first-of-type { margin-top: 20px; padding-top: 0; border-top: none; }
+    .wb-manual__content h3 { font-size: 15px; margin: 24px 0 8px; }
+    .wb-manual__content p { margin: 0 0 14px; }
+    .wb-manual__content ul, .wb-manual__content ol { margin: 0 0 14px; padding-left: 24px; }
+    .wb-manual__content li { margin-bottom: 5px; }
+    .wb-manual__content a { color: #2f5f8f; }
+    .wb-manual__content code { background: #f3f1ec; border-radius: 3px; padding: 1px 5px; font-size: 12.5px; }
+    .wb-manual__code { background: #24262b; color: #e8e6e1; border-radius: 8px; padding: 14px 16px; overflow-x: auto; margin: 0 0 16px; }
+    .wb-manual__code code { background: none; color: inherit; padding: 0; font-size: 12.5px; }
+    .wb-manual__tablewrap { overflow-x: auto; margin: 0 0 18px; }
+    .wb-manual__content table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    .wb-manual__content th, .wb-manual__content td { border: 1px solid #e6e6e6; padding: 8px 10px; text-align: left; vertical-align: top; }
+    .wb-manual__content th { background: #f7f6f3; font-weight: 700; }
+    .wb-manual__content hr { border: 0; border-top: 1px solid #e6e6e6; margin: 24px 0; }
+    .wb-manual__missing { padding: 40px; text-align: center; color: #757575; }
+</style>
+
+<?php if (!$block->isAvailable()): ?>
+    <div class="wb-manual__missing">
+        <?= $escaper->escapeHtml(__('USER_MANUAL.md could not be found in the module directory.')) ?>
+    </div>
+<?php else: ?>
+    <div class="wb-manual">
+        <nav class="wb-manual__nav">
+            <p class="wb-manual__nav-title"><?= $escaper->escapeHtml(__('On this page')) ?></p>
+            <?php foreach ($block->getHeadings() as $heading): ?>
+                <?php if ($heading['level'] === 2): ?>
+                    <a href="#<?= $escaper->escapeHtmlAttr($heading['slug']) ?>"><?= $escaper->escapeHtml($heading['text']) ?></a>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </nav>
+        <article class="wb-manual__content"><?= /* @noEscape */ $block->getManualHtml() ?></article>
+    </div>
+<?php endif; ?>
